@@ -4,7 +4,11 @@ import * as WebBrowser from 'expo-web-browser';
 import { ensureProfile } from './profile';
 import { supabase } from './supabase';
 
-WebBrowser.maybeCompleteAuthSession();
+// This completion hook is only needed for web-based auth flows.
+// Running it eagerly on native has caused unstable module initialization in dev builds.
+if (Platform.OS === 'web') {
+  WebBrowser.maybeCompleteAuthSession();
+}
 
 export function getAuthRedirectUrl() {
   if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
