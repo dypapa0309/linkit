@@ -23,10 +23,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 20,
     marginTop: 16,
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
   },
   text: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
   },
 });

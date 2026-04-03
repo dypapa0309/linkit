@@ -11,7 +11,11 @@ import ServiceCardList from '../../src/components/ServiceCardList';
 import LinkItemList from '../../src/components/LinkItemList';
 import { useAuthStore } from '../../src/stores/authStore';
 import { PublicProfile } from '../../src/types';
-import { fetchPublicProfileByUserId, subscribeToProfileRealtime } from '../../src/utils/profile';
+import {
+  fetchPublicProfileByUserId,
+  openableExternalUrl,
+  subscribeToProfileRealtime,
+} from '../../src/utils/profile';
 import { getPublicProfileUrl } from '../../src/utils/urls';
 
 export default function Preview() {
@@ -86,16 +90,16 @@ export default function Preview() {
 
   const handleCTA = () => {
     if (profile.cta_link) {
-      Linking.openURL(profile.cta_link);
+      Linking.openURL(openableExternalUrl(profile.cta_link));
     }
   };
 
   const handleCardPress = (link: string) => {
-    Linking.openURL(link);
+    Linking.openURL(openableExternalUrl(link));
   };
 
   const handleLinkPress = (link: string) => {
-    Linking.openURL(link);
+    Linking.openURL(openableExternalUrl(link));
   };
 
   const publicProfileUrl = getPublicProfileUrl(profile.username);

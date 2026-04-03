@@ -7,7 +7,11 @@ import TrustBlock from '../components/TrustBlock';
 import ServiceCardList from '../components/ServiceCardList';
 import LinkItemList from '../components/LinkItemList';
 import { PublicProfile } from '../types';
-import { fetchProfileByUsername, subscribeToProfileRealtime } from '../utils/profile';
+import {
+  fetchProfileByUsername,
+  openableExternalUrl,
+  subscribeToProfileRealtime,
+} from '../utils/profile';
 
 interface PublicProfileScreenProps {
   username: string;
@@ -84,16 +88,16 @@ export default function PublicProfileScreen({ username }: PublicProfileScreenPro
 
   const handleCTA = () => {
     if (profile.cta_link) {
-      Linking.openURL(profile.cta_link);
+      Linking.openURL(openableExternalUrl(profile.cta_link));
     }
   };
 
   const handleCardPress = (link: string) => {
-    Linking.openURL(link);
+    Linking.openURL(openableExternalUrl(link));
   };
 
   const handleLinkPress = (link: string) => {
-    Linking.openURL(link);
+    Linking.openURL(openableExternalUrl(link));
   };
 
   return (

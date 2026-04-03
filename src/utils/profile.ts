@@ -168,6 +168,10 @@ export function normalizeExternalUrl(value: string) {
   return `https://${trimmed}`;
 }
 
+export function openableExternalUrl(value: string) {
+  return normalizeExternalUrl(value);
+}
+
 export async function createLinkItem({ userId, title, link, order }: CreateLinkItemInput) {
   const payload = {
     user_id: userId,

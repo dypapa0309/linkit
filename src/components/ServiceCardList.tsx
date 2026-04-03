@@ -32,5 +32,8 @@ export default function ServiceCardList({ cards, onCardPress }: ServiceCardListP
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
   },
 });

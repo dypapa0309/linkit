@@ -35,11 +35,15 @@ export default function LinkItemList({ items, onItemPress }: LinkItemListProps) 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
   },
   item: {
     backgroundColor: '#1F1408',
     borderRadius: 14,
     minHeight: 54,
+    width: '100%',
     paddingHorizontal: 16,
     marginBottom: 10,
     justifyContent: 'center',
