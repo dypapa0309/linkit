@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Linking, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Linking, Platform, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from '../i18n';
 import ProfileHeader from '../components/ProfileHeader';
 import CTAButton from '../components/CTAButton';
@@ -12,6 +12,7 @@ import {
   openableExternalUrl,
   subscribeToProfileRealtime,
 } from '../utils/profile';
+import { getPublicProfileUrl } from '../utils/urls';
 
 interface PublicProfileScreenProps {
   username: string;
@@ -69,6 +70,45 @@ export default function PublicProfileScreen({ username }: PublicProfileScreenPro
         });
     });
   }, [profile?.user_id, username]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') {
+      return;
+    }
+
+    const defaultTitle = 'Linkit';
+    const defaultDescription = '내 소개와 링크를 한 장으로 공유하는 Linkit 프로필 페이지예요.';
+
+    if (!profile) {
+      document.title = defaultTitle;
+      return;
+    }
+
+    const pageTitle = `${profile.name || profile.username} | Linkit`;
+    const pageDescription = profile.bio?.trim() || defaultDescription;
+    const pageUrl = getPublicProfileUrl(profile.username);
+
+    document.title = pageTitle;
+
+    const upsertMeta = (attribute: 'name' | 'property', key: string, content: string) => {
+      let tag = document.head.querySelector(`meta[${attribute}="${key}"]`) as HTMLMetaElement | null;
+
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attribute, key);
+        document.head.appendChild(tag);
+      }
+
+      tag.setAttribute('content', content);
+    };
+
+    upsertMeta('name', 'description', pageDescription);
+    upsertMeta('property', 'og:title', pageTitle);
+    upsertMeta('property', 'og:description', pageDescription);
+    upsertMeta('property', 'og:url', pageUrl);
+    upsertMeta('name', 'twitter:title', pageTitle);
+    upsertMeta('name', 'twitter:description', pageDescription);
+  }, [profile]);
 
   if (loading) {
     return (

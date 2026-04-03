@@ -15,6 +15,7 @@ import {
   getProfileSaveErrorMessage,
   normalizeExternalUrl,
   subscribeToProfileRealtime,
+  updateLinkItem,
   uploadAvatar,
   upsertProfile,
 } from '../../src/utils/profile';
@@ -33,6 +34,7 @@ export default function EditProfile() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<{ uri: string; mimeType?: string | null; fileSize?: number | null } | null>(null);
   const [linkItems, setLinkItems] = useState<LinkItem[]>([]);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
   const [linkTitle, setLinkTitle] = useState('');
   const [linkDescription, setLinkDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
@@ -186,6 +188,23 @@ export default function EditProfile() {
 
   const currentPlan = profile?.plan ?? 'free';
   const freeLinkLimitReached = currentPlan !== 'pro' && linkItems.length >= 3;
+  const linkSubmitDisabled = linkLoading || (!editingLinkId && freeLinkLimitReached);
+
+  const resetLinkForm = () => {
+    setEditingLinkId(null);
+    setLinkTitle('');
+    setLinkDescription('');
+    setLinkUrl('');
+  };
+
+  const handleEditLink = (item: LinkItem) => {
+    setEditingLinkId(item.id);
+    setLinkTitle(item.title);
+    setLinkDescription(item.description ?? '');
+    setLinkUrl(item.link);
+    setLinkMessage('');
+    setLinkErrorMessage('');
+  };
 
   const handleAddLink = async () => {
     if (!user) {
@@ -197,7 +216,7 @@ export default function EditProfile() {
       return;
     }
 
-    if (freeLinkLimitReached) {
+    if (!editingLinkId && freeLinkLimitReached) {
       setLinkErrorMessage(t.profile.linkLimitReached);
       return;
     }
@@ -207,19 +226,30 @@ export default function EditProfile() {
     setLinkErrorMessage('');
 
     try {
-      const nextLink = await createLinkItem({
-        userId: user.id,
-        title: linkTitle.trim(),
-        description: linkDescription.trim(),
-        link: normalizeExternalUrl(linkUrl),
-        order: linkItems.length,
-      });
+      if (editingLinkId) {
+        const nextLink = await updateLinkItem({
+          id: editingLinkId,
+          title: linkTitle.trim(),
+          description: linkDescription.trim(),
+          link: normalizeExternalUrl(linkUrl),
+        });
 
-      setLinkItems((current) => [...current, nextLink]);
-      setLinkTitle('');
-      setLinkDescription('');
-      setLinkUrl('');
-      setLinkMessage(t.profile.linkSaved);
+        setLinkItems((current) => current.map((item) => (item.id === editingLinkId ? nextLink : item)));
+        setLinkMessage(t.profile.linkUpdated);
+      } else {
+        const nextLink = await createLinkItem({
+          userId: user.id,
+          title: linkTitle.trim(),
+          description: linkDescription.trim(),
+          link: normalizeExternalUrl(linkUrl),
+          order: linkItems.length,
+        });
+
+        setLinkItems((current) => [...current, nextLink]);
+        setLinkMessage(t.profile.linkSaved);
+      }
+
+      resetLinkForm();
     } catch (error) {
       setLinkErrorMessage(getLinkItemSaveErrorMessage(error));
     } finally {
@@ -235,6 +265,9 @@ export default function EditProfile() {
     try {
       await deleteLinkItem(id);
       setLinkItems((current) => current.filter((item) => item.id !== id));
+      if (editingLinkId === id) {
+        resetLinkForm();
+      }
     } catch (error) {
       setLinkErrorMessage(getLinkItemSaveErrorMessage(error));
     } finally {
@@ -332,13 +365,24 @@ export default function EditProfile() {
             <View key={item.id} style={styles.linkCard}>
               <View style={styles.linkCardBody}>
                 <Text style={styles.linkCardTitle}>{item.title}</Text>
+                {item.description ? <Text style={styles.linkCardDescription}>{item.description}</Text> : null}
                 <Text style={styles.linkCardUrl}>{item.link}</Text>
               </View>
-              <TouchableOpacity onPress={() => void handleDeleteLink(item.id)} style={styles.deleteButton}>
-                <Text style={styles.deleteButtonText}>{t.profile.deleteLink}</Text>
-              </TouchableOpacity>
+              <View style={styles.linkCardActions}>
+                <TouchableOpacity
+                  onPress={() => handleEditLink(item)}
+                  style={styles.editButton}
+                >
+                  <Text style={styles.editButtonText}>{t.profile.editLink}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => void handleDeleteLink(item.id)} style={styles.deleteButton}>
+                  <Text style={styles.deleteButtonText}>{t.profile.deleteLink}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
+
+          {editingLinkId ? <Text style={styles.editingLabel}>{t.profile.editingLink}</Text> : null}
 
           <TextInput
             style={styles.input}
@@ -362,19 +406,28 @@ export default function EditProfile() {
             autoCorrect={false}
           />
 
-          {freeLinkLimitReached ? <Text style={styles.limitText}>{t.profile.linkLimitReached}</Text> : null}
+          {!editingLinkId && freeLinkLimitReached ? <Text style={styles.limitText}>{t.profile.linkLimitReached}</Text> : null}
           {linkErrorMessage ? <Text style={styles.errorText}>{linkErrorMessage}</Text> : null}
           {linkMessage ? <Text style={styles.successText}>{linkMessage}</Text> : null}
 
           <TouchableOpacity
-            style={[styles.secondaryActionButton, (linkLoading || freeLinkLimitReached) && styles.secondaryActionButtonDisabled]}
+            style={[styles.secondaryActionButton, linkSubmitDisabled && styles.secondaryActionButtonDisabled]}
             onPress={() => void handleAddLink()}
-            disabled={linkLoading || freeLinkLimitReached}
+            disabled={linkSubmitDisabled}
           >
             <Text style={styles.secondaryActionButtonText}>
-              {linkLoading ? t.profile.saving : t.profile.addLink}
+              {linkLoading ? t.profile.saving : editingLinkId ? t.common.save : t.profile.addLink}
             </Text>
           </TouchableOpacity>
+          {editingLinkId ? (
+            <TouchableOpacity
+              style={styles.linkCancelButton}
+              onPress={resetLinkForm}
+              disabled={linkLoading}
+            >
+              <Text style={styles.linkCancelButtonText}>{t.common.cancel}</Text>
+            </TouchableOpacity>
+          ) : null}
 
           {currentPlan !== 'pro' ? (
             <View style={styles.upgradeCard}>
@@ -505,14 +558,34 @@ const styles = StyleSheet.create({
   linkCardBody: {
     flex: 1,
   },
+  linkCardActions: {
+    gap: 8,
+  },
   linkCardTitle: {
     color: '#1F1408',
     fontWeight: '700',
     marginBottom: 4,
   },
+  linkCardDescription: {
+    color: '#8B5A2B',
+    fontSize: 12,
+    marginBottom: 4,
+  },
   linkCardUrl: {
     color: '#6C5B4B',
     fontSize: 13,
+  },
+  editButton: {
+    minHeight: 40,
+    borderRadius: 12,
+    backgroundColor: '#1F1408',
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   deleteButton: {
     minHeight: 40,
@@ -542,6 +615,25 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  linkCancelButton: {
+    minHeight: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D9CBB9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  linkCancelButtonText: {
+    color: '#6C5B4B',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  editingLabel: {
+    color: '#8B5A2B',
+    fontWeight: '700',
+    marginBottom: 10,
   },
   limitText: {
     color: '#8B5A2B',

@@ -155,6 +155,13 @@ interface CreateLinkItemInput {
   order: number;
 }
 
+interface UpdateLinkItemInput {
+  id: string;
+  title: string;
+  description?: string;
+  link: string;
+}
+
 export function normalizeExternalUrl(value: string) {
   const trimmed = value.trim();
 
@@ -204,6 +211,27 @@ export async function deleteLinkItem(id: string) {
   if (error) {
     throw error;
   }
+}
+
+export async function updateLinkItem({ id, title, description, link }: UpdateLinkItemInput) {
+  const payload = {
+    title,
+    description: description ?? '',
+    link: normalizeExternalUrl(link),
+  };
+
+  const { data, error } = await supabase
+    .from('link_items')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single<LinkItem>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 
 export function getLinkItemSaveErrorMessage(error: unknown) {

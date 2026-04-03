@@ -113,6 +113,10 @@ export default function Preview() {
     }, 1800);
   };
 
+  const handleOpenPublicUrl = () => {
+    Linking.openURL(publicProfileUrl);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader name={profile.name || profile.username} bio={profile.bio} avatarUrl={profile.avatar_url} />
@@ -133,11 +137,18 @@ export default function Preview() {
 
       <View style={styles.publicUrlRow}>
         <Text style={styles.publicUrlLabel}>{t.profile.publicUrl}</Text>
-        <Pressable style={styles.copyButton} onPress={() => void handleCopyPublicUrl()}>
-          <Ionicons name="copy-outline" size={18} color="#1F1408" />
-        </Pressable>
       </View>
       <Text style={styles.publicUrlValue}>{publicProfileUrl}</Text>
+      <View style={styles.publicUrlActions}>
+        <Pressable style={styles.publicActionButton} onPress={handleOpenPublicUrl}>
+          <Ionicons name="open-outline" size={18} color="#1F1408" />
+          <Text style={styles.publicActionText}>{t.profile.openPublicPage}</Text>
+        </Pressable>
+        <Pressable style={styles.publicActionButton} onPress={() => void handleCopyPublicUrl()}>
+          <Ionicons name="copy-outline" size={18} color="#1F1408" />
+          <Text style={styles.publicActionText}>{t.profile.copyAddress}</Text>
+        </Pressable>
+      </View>
       {copyMessage ? <Text style={styles.copyMessage}>{copyMessage}</Text> : null}
       
       <Link href="/profile/edit" style={styles.link}>
@@ -179,16 +190,30 @@ const styles = StyleSheet.create({
   publicUrlValue: {
     textAlign: 'center',
     color: '#1F1408',
-    marginBottom: 20,
+    marginBottom: 12,
     paddingHorizontal: 20,
   },
-  copyButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+  publicUrlActions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 20,
+    marginBottom: 8,
+  },
+  publicActionButton: {
+    minHeight: 40,
+    borderRadius: 12,
     backgroundColor: '#F3E7DA',
+    paddingHorizontal: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+  },
+  publicActionText: {
+    color: '#1F1408',
+    fontWeight: '600',
+    fontSize: 13,
   },
   copyMessage: {
     textAlign: 'center',
