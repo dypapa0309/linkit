@@ -4,6 +4,8 @@ import * as WebBrowser from 'expo-web-browser';
 import { ensureProfile } from './profile';
 import { supabase } from './supabase';
 
+const nativeAuthRedirectUrl = 'linkit://auth/callback';
+
 // This completion hook is only needed for web-based auth flows.
 // Running it eagerly on native has caused unstable module initialization in dev builds.
 if (Platform.OS === 'web') {
@@ -15,7 +17,7 @@ export function getAuthRedirectUrl() {
     return `${window.location.origin}/auth/callback`;
   }
 
-  return Linking.createURL('/auth/callback');
+  return nativeAuthRedirectUrl;
 }
 
 export function extractAuthParams(rawUrl: string | null) {

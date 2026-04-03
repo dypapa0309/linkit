@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
-import { completeAuthFromUrl } from '../../src/utils/auth';
+import { completeAuthFromUrl, getAuthRedirectUrl } from '../../src/utils/auth';
 
 export default function AuthCallback() {
   const { t } = useTranslation();
@@ -18,7 +18,10 @@ export default function AuthCallback() {
         const initialUrl = await Linking.getInitialURL();
         const fallbackUrl =
           typeof window !== 'undefined' ? window.location.href : null;
-        const url = initialUrl ?? fallbackUrl ?? (typeof params.code === 'string' ? `${Linking.createURL('/auth/callback')}?code=${params.code}` : null);
+        const url =
+          initialUrl
+          ?? fallbackUrl
+          ?? (typeof params.code === 'string' ? `${getAuthRedirectUrl()}?code=${params.code}` : null);
         await completeAuthFromUrl(url);
 
         if (isMounted) {

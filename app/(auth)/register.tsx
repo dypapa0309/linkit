@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import * as Linking from 'expo-linking';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
-import { signInWithGoogle } from '../../src/utils/auth';
+import { getAuthRedirectUrl, signInWithGoogle } from '../../src/utils/auth';
 import { supabase } from '../../src/utils/supabase';
 
 export default function Register() {
@@ -37,7 +36,7 @@ export default function Register() {
       email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: Linking.createURL('/auth/callback'),
+        emailRedirectTo: getAuthRedirectUrl(),
         data: {
           username: normalizedUsername,
         },
