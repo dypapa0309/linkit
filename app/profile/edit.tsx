@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { Link, Redirect } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -14,6 +15,7 @@ import {
   getProfileSaveErrorMessage,
   normalizeExternalUrl,
   subscribeToProfileRealtime,
+  uploadAvatar,
   upsertProfile,
 } from '../../src/utils/profile';
 
@@ -28,8 +30,11 @@ export default function EditProfile() {
   const [bio, setBio] = useState('');
   const [ctaText, setCtaText] = useState('');
   const [ctaLink, setCtaLink] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState<{ uri: string; mimeType?: string | null; fileSize?: number | null } | null>(null);
   const [linkItems, setLinkItems] = useState<LinkItem[]>([]);
   const [linkTitle, setLinkTitle] = useState('');
+  const [linkDescription, setLinkDescription] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [linkLoading, setLinkLoading] = useState(false);
@@ -93,7 +98,36 @@ export default function EditProfile() {
     setBio(profile.bio);
     setCtaText(profile.cta_text);
     setCtaLink(profile.cta_link);
+    setAvatarUrl(profile.avatar_url);
   }, [profile]);
+
+  const handlePickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+
+    const asset = result.assets[0];
+
+    if ((asset.fileSize ?? 0) > 5 * 1024 * 1024) {
+      setErrorMessage(t.profile.avatarSizeError);
+      return;
+    }
+
+    setSelectedAvatar({
+      uri: asset.uri,
+      mimeType: asset.mimeType,
+      fileSize: asset.fileSize,
+    });
+    setAvatarUrl(asset.uri);
+    setErrorMessage('');
+  };
 
   const handleSave = async () => {
     if (!user) {
@@ -117,18 +151,31 @@ export default function EditProfile() {
     setErrorMessage('');
 
     try {
+      let nextAvatarUrl = avatarUrl;
+
+      if (selectedAvatar) {
+        nextAvatarUrl = await uploadAvatar({
+          userId: user.id,
+          uri: selectedAvatar.uri,
+          mimeType: selectedAvatar.mimeType,
+        });
+      }
+
       const nextProfile = await upsertProfile({
         userId: user.id,
         username: trimmedUsername,
         updates: {
           name: name.trim() || trimmedUsername,
           bio: bio.trim(),
+          avatar_url: nextAvatarUrl,
           cta_text: ctaText.trim(),
           cta_link: normalizeExternalUrl(ctaLink),
         },
       });
 
       setProfile(nextProfile);
+      setAvatarUrl(nextProfile.avatar_url);
+      setSelectedAvatar(null);
       setMessage(t.profile.saved);
     } catch (error) {
       setErrorMessage(getProfileSaveErrorMessage(error));
@@ -163,12 +210,14 @@ export default function EditProfile() {
       const nextLink = await createLinkItem({
         userId: user.id,
         title: linkTitle.trim(),
+        description: linkDescription.trim(),
         link: normalizeExternalUrl(linkUrl),
         order: linkItems.length,
       });
 
       setLinkItems((current) => [...current, nextLink]);
       setLinkTitle('');
+      setLinkDescription('');
       setLinkUrl('');
       setLinkMessage(t.profile.linkSaved);
     } catch (error) {
@@ -201,6 +250,17 @@ export default function EditProfile() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.formShell}>
         <Text style={styles.title}>{t.profile.editProfile}</Text>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.profile.avatar}</Text>
+          <Text style={styles.helper}>{t.profile.avatarDescription}</Text>
+          <View style={styles.avatarRow}>
+            {avatarUrl ? <Image source={{ uri: avatarUrl }} style={styles.avatarPreview} /> : <View style={styles.avatarPlaceholder} />}
+            <TouchableOpacity style={styles.secondaryActionButton} onPress={() => void handlePickAvatar()}>
+              <Text style={styles.secondaryActionButtonText}>{t.profile.uploadAvatar}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.profile.publicLinkTitle}</Text>
@@ -288,6 +348,13 @@ export default function EditProfile() {
           />
           <TextInput
             style={styles.input}
+            placeholder={t.profile.linkDescription}
+            value={linkDescription}
+            onChangeText={(value) => setLinkDescription(value.slice(0, 20))}
+            maxLength={20}
+          />
+          <TextInput
+            style={styles.input}
             placeholder={t.profile.linkUrl}
             value={linkUrl}
             onChangeText={setLinkUrl}
@@ -348,6 +415,24 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 760,
     alignSelf: 'center',
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 8,
+  },
+  avatarPreview: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#EEEEEE',
+  },
+  avatarPlaceholder: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#EEEEEE',
   },
   title: {
     fontSize: 28,
@@ -448,6 +533,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 4,
+    paddingHorizontal: 16,
   },
   secondaryActionButtonDisabled: {
     opacity: 0.55,

@@ -36,6 +36,7 @@ export interface LinkItem {
   id: string;
   user_id: string;
   title: string;
+  description?: string;
   link: string;
   order: number;
   created_at?: string;

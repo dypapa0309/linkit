@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Linking, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Linking, StyleSheet, Text, View } from 'react-native';
 import { Link, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
@@ -25,6 +25,7 @@ export default function Preview() {
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [copyMessage, setCopyMessage] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -106,12 +107,15 @@ export default function Preview() {
 
   const handleCopyPublicUrl = async () => {
     await Clipboard.setStringAsync(publicProfileUrl);
-    Alert.alert(t.common.copied, t.profile.publicUrlCopied);
+    setCopyMessage(t.profile.publicUrlCopied);
+    setTimeout(() => {
+      setCopyMessage('');
+    }, 1800);
   };
 
   return (
     <ScrollView style={styles.container}>
-      <ProfileHeader name={profile.name || profile.username} bio={profile.bio} />
+      <ProfileHeader name={profile.name || profile.username} bio={profile.bio} avatarUrl={profile.avatar_url} />
       
       {profile.cta_link ? (
         <CTAButton text={profile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
@@ -134,6 +138,7 @@ export default function Preview() {
         </Pressable>
       </View>
       <Text style={styles.publicUrlValue}>{publicProfileUrl}</Text>
+      {copyMessage ? <Text style={styles.copyMessage}>{copyMessage}</Text> : null}
       
       <Link href="/profile/edit" style={styles.link}>
         <Text>{t.common.edit}</Text>
@@ -184,5 +189,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3E7DA',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  copyMessage: {
+    textAlign: 'center',
+    color: '#8B5A2B',
+    marginBottom: 16,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

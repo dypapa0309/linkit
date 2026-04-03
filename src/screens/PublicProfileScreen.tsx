@@ -103,7 +103,11 @@ export default function PublicProfileScreen({ username }: PublicProfileScreenPro
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.shell}>
-        <ProfileHeader name={profile.name || profile.username} bio={profile.bio} />
+        <ProfileHeader
+          name={profile.name || profile.username}
+          bio={profile.bio}
+          avatarUrl={profile.avatar_url}
+        />
         {profile.cta_link ? (
           <CTAButton text={profile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
         ) : null}

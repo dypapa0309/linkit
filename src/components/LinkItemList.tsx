@@ -4,6 +4,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 interface LinkItem {
   id: string;
   title: string;
+  description?: string;
   link: string;
 }
 
@@ -26,6 +27,7 @@ export default function LinkItemList({ items, onItemPress }: LinkItemListProps) 
           onPress={() => onItemPress(item.link)}
         >
           <Text style={styles.title}>{item.title}</Text>
+          {item.description ? <Text style={styles.description}>{item.description}</Text> : null}
         </TouchableOpacity>
       ))}
     </View>
@@ -54,5 +56,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  description: {
+    color: '#D7C8B5',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 4,
   },
 });

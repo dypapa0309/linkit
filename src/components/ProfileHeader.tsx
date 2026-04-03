@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 interface ProfileHeaderProps {
   name: string;
   bio: string;
+  avatarUrl?: string;
 }
 
-export default function ProfileHeader({ name, bio }: ProfileHeaderProps) {
+export default function ProfileHeader({ name, bio, avatarUrl }: ProfileHeaderProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.avatar} />
+      {avatarUrl ? <Image source={{ uri: avatarUrl }} style={styles.avatar} /> : <View style={styles.avatar} />}
       <Text style={styles.name}>{name}</Text>
       <Text style={styles.bio}>{bio}</Text>
     </View>
@@ -27,6 +28,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     backgroundColor: '#EEEEEE',
     marginBottom: 16,
+    overflow: 'hidden',
   },
   name: {
     fontSize: 20,

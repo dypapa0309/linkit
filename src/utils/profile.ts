@@ -150,6 +150,7 @@ export function getProfileSaveErrorMessage(error: unknown) {
 interface CreateLinkItemInput {
   userId: string;
   title: string;
+  description?: string;
   link: string;
   order: number;
 }
@@ -172,10 +173,11 @@ export function openableExternalUrl(value: string) {
   return normalizeExternalUrl(value);
 }
 
-export async function createLinkItem({ userId, title, link, order }: CreateLinkItemInput) {
+export async function createLinkItem({ userId, title, description, link, order }: CreateLinkItemInput) {
   const payload = {
     user_id: userId,
     title,
+    description: description ?? '',
     link: normalizeExternalUrl(link),
     order,
   };
@@ -220,6 +222,49 @@ export function getLinkItemSaveErrorMessage(error: unknown) {
   }
 
   return '링크를 저장하지 못했어요.';
+}
+
+interface UploadAvatarInput {
+  userId: string;
+  uri: string;
+  mimeType?: string | null;
+}
+
+function getAvatarExtension(mimeType?: string | null) {
+  if (!mimeType) {
+    return 'jpg';
+  }
+
+  if (mimeType.includes('png')) {
+    return 'png';
+  }
+
+  if (mimeType.includes('webp')) {
+    return 'webp';
+  }
+
+  return 'jpg';
+}
+
+export async function uploadAvatar({ userId, uri, mimeType }: UploadAvatarInput) {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  const extension = getAvatarExtension(mimeType);
+  const path = `${userId}/avatar.${extension}`;
+
+  const { error } = await supabase.storage.from('avatars').upload(path, blob, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: mimeType ?? undefined,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+
+  return data.publicUrl;
 }
 
 export function subscribeToProfileRealtime(userId: string, onChange: () => void) {
