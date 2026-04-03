@@ -1,5 +1,5 @@
 import { PostgrestError } from '@supabase/supabase-js';
-import { PublicProfile, Profile } from '../types';
+import { LinkItem, PublicProfile, Profile } from '../types';
 import { supabase } from './supabase';
 
 export const defaultProfileValues: Omit<Profile, 'user_id' | 'username'> = {
@@ -13,7 +13,7 @@ export const defaultProfileValues: Omit<Profile, 'user_id' | 'username'> = {
   trust_reuse_rate: '',
 };
 
-export function buildPublicProfile(profile: Profile | null): PublicProfile | null {
+export function buildPublicProfile(profile: Profile | null, linkItems: LinkItem[] = []): PublicProfile | null {
   if (!profile) {
     return null;
   }
@@ -21,7 +21,7 @@ export function buildPublicProfile(profile: Profile | null): PublicProfile | nul
   return {
     ...profile,
     serviceCards: [],
-    linkItems: [],
+    linkItems,
   };
 }
 
@@ -54,7 +54,37 @@ export async function fetchProfileByUsername(username: string) {
     throw error;
   }
 
-  return buildPublicProfile(data ?? null);
+  if (!data) {
+    return null;
+  }
+
+  const linkItems = await fetchLinkItemsByUserId(data.user_id);
+
+  return buildPublicProfile(data, linkItems);
+}
+
+export async function fetchLinkItemsByUserId(userId: string) {
+  const { data, error } = await supabase
+    .from('link_items')
+    .select('*')
+    .eq('user_id', userId)
+    .order('order', { ascending: true })
+    .returns<LinkItem[]>();
+
+  if (error && !shouldIgnoreMissingTable(error)) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function fetchPublicProfileByUserId(userId: string) {
+  const [profile, linkItems] = await Promise.all([
+    fetchProfileByUserId(userId),
+    fetchLinkItemsByUserId(userId),
+  ]);
+
+  return buildPublicProfile(profile, linkItems);
 }
 
 interface UpsertProfileInput {
@@ -115,6 +145,93 @@ export function getProfileSaveErrorMessage(error: unknown) {
   }
 
   return '저장 중 오류가 발생했어요.';
+}
+
+interface CreateLinkItemInput {
+  userId: string;
+  title: string;
+  link: string;
+  order: number;
+}
+
+export async function createLinkItem({ userId, title, link, order }: CreateLinkItemInput) {
+  const payload = {
+    user_id: userId,
+    title,
+    link,
+    order,
+  };
+
+  const { data, error } = await supabase
+    .from('link_items')
+    .insert(payload)
+    .select()
+    .single<LinkItem>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function deleteLinkItem(id: string) {
+  const { error } = await supabase
+    .from('link_items')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export function getLinkItemSaveErrorMessage(error: unknown) {
+  if (error instanceof PostgrestError) {
+    if (error.code === 'P0001') {
+      return error.message;
+    }
+
+    if (error.message) {
+      return error.message;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return '링크를 저장하지 못했어요.';
+}
+
+export function subscribeToProfileRealtime(userId: string, onChange: () => void) {
+  const channel = supabase
+    .channel(`profile-${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `user_id=eq.${userId}`,
+      },
+      onChange
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'link_items',
+        filter: `user_id=eq.${userId}`,
+      },
+      onChange
+    )
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function ensureProfile({

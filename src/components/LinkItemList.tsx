@@ -13,6 +13,10 @@ interface LinkItemListProps {
 }
 
 export default function LinkItemList({ items, onItemPress }: LinkItemListProps) {
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       {items.map(item => (
@@ -21,7 +25,7 @@ export default function LinkItemList({ items, onItemPress }: LinkItemListProps) 
           style={styles.item}
           onPress={() => onItemPress(item.link)}
         >
-          <Text>{item.title}</Text>
+          <Text style={styles.title}>{item.title}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -33,9 +37,18 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   item: {
-    backgroundColor: '#F7F7F7',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: '#1F1408',
+    borderRadius: 14,
+    minHeight: 54,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });

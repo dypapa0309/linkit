@@ -7,7 +7,7 @@ import TrustBlock from '../components/TrustBlock';
 import ServiceCardList from '../components/ServiceCardList';
 import LinkItemList from '../components/LinkItemList';
 import { PublicProfile } from '../types';
-import { fetchProfileByUsername } from '../utils/profile';
+import { fetchProfileByUsername, subscribeToProfileRealtime } from '../utils/profile';
 
 interface PublicProfileScreenProps {
   username: string;
@@ -49,6 +49,22 @@ export default function PublicProfileScreen({ username }: PublicProfileScreenPro
       isMounted = false;
     };
   }, [t.profile.fetchError, username]);
+
+  useEffect(() => {
+    if (!profile?.user_id) {
+      return;
+    }
+
+    return subscribeToProfileRealtime(profile.user_id, () => {
+      void fetchProfileByUsername(username)
+        .then((nextProfile) => {
+          setProfile(nextProfile);
+        })
+        .catch(() => {
+          // Keep the current public view if the realtime refresh fails.
+        });
+    });
+  }, [profile?.user_id, username]);
 
   if (loading) {
     return (

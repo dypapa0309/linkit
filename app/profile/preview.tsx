@@ -8,20 +8,19 @@ import TrustBlock from '../../src/components/TrustBlock';
 import ServiceCardList from '../../src/components/ServiceCardList';
 import LinkItemList from '../../src/components/LinkItemList';
 import { useAuthStore } from '../../src/stores/authStore';
-import { useProfileStore } from '../../src/stores/profileStore';
-import { buildPublicProfile, fetchProfileByUserId } from '../../src/utils/profile';
+import { PublicProfile } from '../../src/types';
+import { fetchPublicProfileByUserId, subscribeToProfileRealtime } from '../../src/utils/profile';
 
 export default function Preview() {
   const { t } = useTranslation();
   const initialized = useAuthStore((state) => state.initialized);
   const user = useAuthStore((state) => state.user);
-  const profile = useProfileStore((state) => state.profile);
-  const setProfile = useProfileStore((state) => state.setProfile);
+  const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    if (!user || profile) {
+    if (!user) {
       return;
     }
 
@@ -31,9 +30,9 @@ export default function Preview() {
       setLoading(true);
 
       try {
-        const nextProfile = await fetchProfileByUserId(user.id);
+        const nextProfile = await fetchPublicProfileByUserId(user.id);
 
-        if (isMounted && nextProfile) {
+        if (isMounted) {
           setProfile(nextProfile);
         }
       } catch (error) {
@@ -49,10 +48,15 @@ export default function Preview() {
 
     void loadProfile();
 
+    const unsubscribe = subscribeToProfileRealtime(user.id, () => {
+      void loadProfile();
+    });
+
     return () => {
       isMounted = false;
+      unsubscribe();
     };
-  }, [profile, setProfile, t.profile.fetchError, user]);
+  }, [t.profile.fetchError, user]);
 
   if (initialized && !user) {
     return <Redirect href="/(auth)/login" />;
@@ -66,9 +70,7 @@ export default function Preview() {
     );
   }
 
-  const publicProfile = buildPublicProfile(profile);
-
-  if (!publicProfile) {
+  if (!profile) {
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.message}>{errorMessage || t.profile.saveFirst}</Text>
@@ -80,8 +82,8 @@ export default function Preview() {
   }
 
   const handleCTA = () => {
-    if (publicProfile.cta_link) {
-      Linking.openURL(publicProfile.cta_link);
+    if (profile.cta_link) {
+      Linking.openURL(profile.cta_link);
     }
   };
 
@@ -95,23 +97,23 @@ export default function Preview() {
 
   return (
     <ScrollView style={styles.container}>
-      <ProfileHeader name={publicProfile.name || publicProfile.username} bio={publicProfile.bio} />
+      <ProfileHeader name={profile.name || profile.username} bio={profile.bio} />
       
-      {publicProfile.cta_link ? (
-        <CTAButton text={publicProfile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
+      {profile.cta_link ? (
+        <CTAButton text={profile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
       ) : null}
       
       <TrustBlock
-        reviewCount={publicProfile.trust_review_count}
-        responseTime={publicProfile.trust_response_time}
-        reuseRate={publicProfile.trust_reuse_rate}
+        reviewCount={profile.trust_review_count}
+        responseTime={profile.trust_response_time}
+        reuseRate={profile.trust_reuse_rate}
       />
       
-      <ServiceCardList cards={publicProfile.serviceCards} onCardPress={handleCardPress} />
+      <ServiceCardList cards={profile.serviceCards} onCardPress={handleCardPress} />
       
-      <LinkItemList items={publicProfile.linkItems} onItemPress={handleLinkPress} />
+      <LinkItemList items={profile.linkItems} onItemPress={handleLinkPress} />
 
-      <Text style={styles.publicUrl}>{t.profile.publicUrl}: /{publicProfile.username}</Text>
+      <Text style={styles.publicUrl}>{t.profile.publicUrl}: /{profile.username}</Text>
       
       <Link href="/profile/edit" style={styles.link}>
         <Text>{t.common.edit}</Text>

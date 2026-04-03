@@ -15,6 +15,7 @@ export interface Profile {
   trust_review_count: number;
   trust_response_time: string;
   trust_reuse_rate: string;
+  plan?: 'free' | 'pro' | string;
 }
 
 export interface ServiceCard {
@@ -37,4 +38,6 @@ export interface LinkItem {
   title: string;
   link: string;
   order: number;
+  created_at?: string;
+  updated_at?: string;
 }
