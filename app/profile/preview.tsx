@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Linking, StyleSheet, Text } from 'react-native';
+import { Alert, Pressable, ScrollView, Linking, StyleSheet, Text, View } from 'react-native';
 import { Link, Redirect } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import { useTranslation } from '../../src/i18n';
 import ProfileHeader from '../../src/components/ProfileHeader';
 import CTAButton from '../../src/components/CTAButton';
@@ -10,6 +12,7 @@ import LinkItemList from '../../src/components/LinkItemList';
 import { useAuthStore } from '../../src/stores/authStore';
 import { PublicProfile } from '../../src/types';
 import { fetchPublicProfileByUserId, subscribeToProfileRealtime } from '../../src/utils/profile';
+import { getPublicProfileUrl } from '../../src/utils/urls';
 
 export default function Preview() {
   const { t } = useTranslation();
@@ -95,6 +98,13 @@ export default function Preview() {
     Linking.openURL(link);
   };
 
+  const publicProfileUrl = getPublicProfileUrl(profile.username);
+
+  const handleCopyPublicUrl = async () => {
+    await Clipboard.setStringAsync(publicProfileUrl);
+    Alert.alert(t.common.copied, t.profile.publicUrlCopied);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader name={profile.name || profile.username} bio={profile.bio} />
@@ -113,7 +123,13 @@ export default function Preview() {
       
       <LinkItemList items={profile.linkItems} onItemPress={handleLinkPress} />
 
-      <Text style={styles.publicUrl}>{t.profile.publicUrl}: /{profile.username}</Text>
+      <View style={styles.publicUrlRow}>
+        <Text style={styles.publicUrlLabel}>{t.profile.publicUrl}</Text>
+        <Pressable style={styles.copyButton} onPress={() => void handleCopyPublicUrl()}>
+          <Ionicons name="copy-outline" size={18} color="#1F1408" />
+        </Pressable>
+      </View>
+      <Text style={styles.publicUrlValue}>{publicProfileUrl}</Text>
       
       <Link href="/profile/edit" style={styles.link}>
         <Text>{t.common.edit}</Text>
@@ -138,9 +154,31 @@ const styles = StyleSheet.create({
     padding: 20,
     textAlign: 'center',
   },
-  publicUrl: {
-    textAlign: 'center',
+  publicUrlRow: {
+    marginTop: 4,
+    marginBottom: 8,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  publicUrlLabel: {
     color: '#666666',
+    fontWeight: '600',
+  },
+  publicUrlValue: {
+    textAlign: 'center',
+    color: '#1F1408',
     marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  copyButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#F3E7DA',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

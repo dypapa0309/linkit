@@ -3,28 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
-import { ensureProfile } from '../../src/utils/profile';
-import { supabase } from '../../src/utils/supabase';
-
-function extractAuthParams(rawUrl: string | null) {
-  if (!rawUrl) {
-    return {
-      accessToken: null,
-      refreshToken: null,
-      code: null,
-    };
-  }
-
-  const normalizedUrl = rawUrl.replace('#', '?');
-  const parsed = Linking.parse(normalizedUrl);
-  const params = parsed.queryParams ?? {};
-
-  const accessToken = typeof params.access_token === 'string' ? params.access_token : null;
-  const refreshToken = typeof params.refresh_token === 'string' ? params.refresh_token : null;
-  const code = typeof params.code === 'string' ? params.code : null;
-
-  return { accessToken, refreshToken, code };
-}
+import { completeAuthFromUrl } from '../../src/utils/auth';
 
 export default function AuthCallback() {
   const { t } = useTranslation();
@@ -39,49 +18,8 @@ export default function AuthCallback() {
         const initialUrl = await Linking.getInitialURL();
         const fallbackUrl =
           typeof window !== 'undefined' ? window.location.href : null;
-        const url = initialUrl ?? fallbackUrl;
-        const { accessToken, refreshToken, code } = extractAuthParams(url);
-        const queryCode = typeof params.code === 'string' ? params.code : null;
-        const queryAccessToken =
-          typeof params.access_token === 'string' ? params.access_token : null;
-        const queryRefreshToken =
-          typeof params.refresh_token === 'string' ? params.refresh_token : null;
-
-        const finalCode = queryCode ?? code;
-        const finalAccessToken = queryAccessToken ?? accessToken;
-        const finalRefreshToken = queryRefreshToken ?? refreshToken;
-
-        if (finalCode) {
-          const { error } = await supabase.auth.exchangeCodeForSession(finalCode);
-
-          if (error) {
-            throw error;
-          }
-        } else if (finalAccessToken && finalRefreshToken) {
-          const { error } = await supabase.auth.setSession({
-            access_token: finalAccessToken,
-            refresh_token: finalRefreshToken,
-          });
-
-          if (error) {
-            throw error;
-          }
-        }
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session?.user) {
-          throw new Error(t.authCallback.sessionError);
-        }
-
-        await ensureProfile({
-          userId: session.user.id,
-          email: session.user.email ?? null,
-          username: (session.user.user_metadata?.username as string | undefined) ?? null,
-          name: (session.user.user_metadata?.username as string | undefined) ?? null,
-        });
+        const url = initialUrl ?? fallbackUrl ?? (typeof params.code === 'string' ? `${Linking.createURL('/auth/callback')}?code=${params.code}` : null);
+        await completeAuthFromUrl(url);
 
         if (isMounted) {
           setMessage(t.authCallback.success);

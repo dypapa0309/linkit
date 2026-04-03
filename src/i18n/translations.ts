@@ -12,6 +12,7 @@ export const translations = {
       preview: '미리보기',
       edit: '수정',
       backHome: '홈으로',
+      copied: '복사됨',
     },
     home: {
       eyebrow: '공유 링크를 받은 사람은 로그인 없이 바로 볼 수 있어요',
@@ -53,6 +54,9 @@ export const translations = {
       missingRegisterFields: '이메일, 비밀번호, username을 모두 입력해주세요.',
       profileCreateError: '프로필 생성 중 오류가 발생했어요.',
       emailConfirmationSent: '회원가입이 완료됐어요. 메일 인증 링크를 누르면 앱으로 돌아와요.',
+      continueWithGoogle: 'Google로 계속하기',
+      googleLoading: 'Google 로그인 준비 중...',
+      googleLoginError: 'Google 로그인 중 오류가 발생했어요.',
     },
     profile: {
       editProfile: '프로필 수정',
@@ -99,6 +103,7 @@ export const translations = {
       upgradeDescription: '무료 플랜은 최대 3개까지 추가 링크를 제공합니다. 그 이상은 유료 플랜으로 확장할 수 있게 준비 중이에요.',
       upgradeComingSoon: '결제 연동은 다음 단계에서 연결할 예정이에요.',
       connectedLinks: '연결된 링크',
+      publicUrlCopied: '공개 링크를 복사했어요.',
     },
     publicPage: {
       notFound: '프로필을 찾을 수 없어요.',
@@ -143,6 +148,7 @@ export const translations = {
       preview: 'Preview',
       edit: 'Edit',
       backHome: 'Back Home',
+      copied: 'Copied',
     },
     home: {
       eyebrow: 'Shared profile links open instantly without login',
@@ -188,6 +194,9 @@ export const translations = {
       profileCreateError: 'Something went wrong while creating your profile.',
       emailConfirmationSent:
         'Your account has been created. Tap the verification link in your email to return to the app.',
+      continueWithGoogle: 'Continue with Google',
+      googleLoading: 'Preparing Google sign-in...',
+      googleLoginError: 'Something went wrong during Google sign-in.',
     },
     profile: {
       editProfile: 'Edit Profile',
@@ -239,6 +248,7 @@ export const translations = {
         'The free plan includes up to 3 additional links. A paid plan for more links is planned next.',
       upgradeComingSoon: 'Payment integration is planned for the next step.',
       connectedLinks: 'Connected links',
+      publicUrlCopied: 'Public link copied.',
     },
     publicPage: {
       notFound: 'Profile not found.',

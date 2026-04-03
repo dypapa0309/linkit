@@ -154,11 +154,25 @@ interface CreateLinkItemInput {
   order: number;
 }
 
+export function normalizeExternalUrl(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return '';
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+}
+
 export async function createLinkItem({ userId, title, link, order }: CreateLinkItemInput) {
   const payload = {
     user_id: userId,
     title,
-    link,
+    link: normalizeExternalUrl(link),
     order,
   };
 

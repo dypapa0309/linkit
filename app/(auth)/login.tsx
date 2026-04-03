@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
+import { signInWithGoogle } from '../../src/utils/auth';
 import { ensureProfile } from '../../src/utils/profile';
 import { supabase } from '../../src/utils/supabase';
 
@@ -13,6 +14,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
@@ -58,6 +60,23 @@ export default function Login() {
     router.replace('/profile/preview');
   };
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setErrorMessage('');
+
+    try {
+      const session = await signInWithGoogle();
+
+      if (session?.user) {
+        router.replace('/profile/preview');
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t.auth.googleLoginError);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   if (initialized && user) {
     return <Redirect href="/profile/preview" />;
   }
@@ -82,6 +101,15 @@ export default function Login() {
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={() => void handleLogin()} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? t.auth.loggingIn : t.auth.loginButton}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.googleButton}
+        onPress={() => void handleGoogleLogin()}
+        disabled={googleLoading}
+      >
+        <Text style={styles.googleButtonText}>
+          {googleLoading ? t.auth.googleLoading : t.auth.continueWithGoogle}
+        </Text>
       </TouchableOpacity>
       <Link href="/(auth)/register" style={styles.link}>
         <Text>{t.auth.noAccount}</Text>
@@ -119,8 +147,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  googleButton: {
+    height: 52,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#DADADA',
+    backgroundColor: '#FFFFFF',
+  },
   buttonText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  googleButtonText: {
+    color: '#1F1408',
     fontSize: 16,
     fontWeight: '600',
   },

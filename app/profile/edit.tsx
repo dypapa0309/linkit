@@ -12,6 +12,7 @@ import {
   fetchProfileByUserId,
   getLinkItemSaveErrorMessage,
   getProfileSaveErrorMessage,
+  normalizeExternalUrl,
   subscribeToProfileRealtime,
   upsertProfile,
 } from '../../src/utils/profile';
@@ -123,7 +124,7 @@ export default function EditProfile() {
           name: name.trim() || trimmedUsername,
           bio: bio.trim(),
           cta_text: ctaText.trim(),
-          cta_link: ctaLink.trim(),
+          cta_link: normalizeExternalUrl(ctaLink),
         },
       });
 
@@ -162,7 +163,7 @@ export default function EditProfile() {
       const nextLink = await createLinkItem({
         userId: user.id,
         title: linkTitle.trim(),
-        link: linkUrl.trim(),
+        link: normalizeExternalUrl(linkUrl),
         order: linkItems.length,
       });
 
