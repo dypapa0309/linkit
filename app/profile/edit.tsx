@@ -198,138 +198,140 @@ export default function EditProfile() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>{t.profile.editProfile}</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.formShell}>
+        <Text style={styles.title}>{t.profile.editProfile}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.profile.publicLinkTitle}</Text>
-        <Text style={styles.helper}>{t.profile.publicLinkDescription}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t.auth.username}
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.profile.name}</Text>
-        <Text style={styles.helper}>{t.profile.displayNameDescription}</Text>
-        <TextInput style={styles.input} placeholder={t.profile.name} value={name} onChangeText={setName} />
-
-        <Text style={styles.sectionTitle}>{t.profile.bio}</Text>
-        <Text style={styles.helper}>{t.profile.bioDescription}</Text>
-        <TextInput
-          style={[styles.input, styles.multilineInput]}
-          placeholder={t.profile.bio}
-          value={bio}
-          onChangeText={setBio}
-          multiline
-          textAlignVertical="top"
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.profile.cta}</Text>
-        <Text style={styles.helper}>{t.profile.primaryButtonDescription}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t.profile.ctaText}
-          value={ctaText}
-          onChangeText={setCtaText}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={t.profile.ctaLink}
-          value={ctaLink}
-          onChangeText={setCtaLink}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.profile.additionalLinks}</Text>
-        <Text style={styles.helper}>
-          {currentPlan === 'pro' ? t.profile.proLinksDescription : t.profile.freeLinksDescription}
-        </Text>
-
-        <View style={styles.planBadgeRow}>
-          <Text style={styles.planBadge}>
-            {currentPlan === 'pro' ? t.profile.proPlan : t.profile.freePlan}
-          </Text>
-          <Text style={styles.planMeta}>
-            {currentPlan === 'pro'
-              ? `${t.profile.connectedLinks} ${linkItems.length}`
-              : `${linkItems.length}/3 ${t.profile.freePlanCount}`}
-          </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.profile.publicLinkTitle}</Text>
+          <Text style={styles.helper}>{t.profile.publicLinkDescription}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t.auth.username}
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
         </View>
 
-        {linkItems.map((item) => (
-          <View key={item.id} style={styles.linkCard}>
-            <View style={styles.linkCardBody}>
-              <Text style={styles.linkCardTitle}>{item.title}</Text>
-              <Text style={styles.linkCardUrl}>{item.link}</Text>
-            </View>
-            <TouchableOpacity onPress={() => void handleDeleteLink(item.id)} style={styles.deleteButton}>
-              <Text style={styles.deleteButtonText}>{t.profile.deleteLink}</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.profile.name}</Text>
+          <Text style={styles.helper}>{t.profile.displayNameDescription}</Text>
+          <TextInput style={styles.input} placeholder={t.profile.name} value={name} onChangeText={setName} />
 
-        <TextInput
-          style={styles.input}
-          placeholder={t.profile.linkTitle}
-          value={linkTitle}
-          onChangeText={setLinkTitle}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={t.profile.linkUrl}
-          value={linkUrl}
-          onChangeText={setLinkUrl}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+          <Text style={styles.sectionTitle}>{t.profile.bio}</Text>
+          <Text style={styles.helper}>{t.profile.bioDescription}</Text>
+          <TextInput
+            style={[styles.input, styles.multilineInput]}
+            placeholder={t.profile.bio}
+            value={bio}
+            onChangeText={setBio}
+            multiline
+            textAlignVertical="top"
+          />
+        </View>
 
-        {freeLinkLimitReached ? <Text style={styles.limitText}>{t.profile.linkLimitReached}</Text> : null}
-        {linkErrorMessage ? <Text style={styles.errorText}>{linkErrorMessage}</Text> : null}
-        {linkMessage ? <Text style={styles.successText}>{linkMessage}</Text> : null}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.profile.cta}</Text>
+          <Text style={styles.helper}>{t.profile.primaryButtonDescription}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={t.profile.ctaText}
+            value={ctaText}
+            onChangeText={setCtaText}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={t.profile.ctaLink}
+            value={ctaLink}
+            onChangeText={setCtaLink}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        </View>
 
-        <TouchableOpacity
-          style={[styles.secondaryActionButton, (linkLoading || freeLinkLimitReached) && styles.secondaryActionButtonDisabled]}
-          onPress={() => void handleAddLink()}
-          disabled={linkLoading || freeLinkLimitReached}
-        >
-          <Text style={styles.secondaryActionButtonText}>
-            {linkLoading ? t.profile.saving : t.profile.addLink}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t.profile.additionalLinks}</Text>
+          <Text style={styles.helper}>
+            {currentPlan === 'pro' ? t.profile.proLinksDescription : t.profile.freeLinksDescription}
           </Text>
+
+          <View style={styles.planBadgeRow}>
+            <Text style={styles.planBadge}>
+              {currentPlan === 'pro' ? t.profile.proPlan : t.profile.freePlan}
+            </Text>
+            <Text style={styles.planMeta}>
+              {currentPlan === 'pro'
+                ? `${t.profile.connectedLinks} ${linkItems.length}`
+                : `${linkItems.length}/3 ${t.profile.freePlanCount}`}
+            </Text>
+          </View>
+
+          {linkItems.map((item) => (
+            <View key={item.id} style={styles.linkCard}>
+              <View style={styles.linkCardBody}>
+                <Text style={styles.linkCardTitle}>{item.title}</Text>
+                <Text style={styles.linkCardUrl}>{item.link}</Text>
+              </View>
+              <TouchableOpacity onPress={() => void handleDeleteLink(item.id)} style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>{t.profile.deleteLink}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <TextInput
+            style={styles.input}
+            placeholder={t.profile.linkTitle}
+            value={linkTitle}
+            onChangeText={setLinkTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={t.profile.linkUrl}
+            value={linkUrl}
+            onChangeText={setLinkUrl}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          {freeLinkLimitReached ? <Text style={styles.limitText}>{t.profile.linkLimitReached}</Text> : null}
+          {linkErrorMessage ? <Text style={styles.errorText}>{linkErrorMessage}</Text> : null}
+          {linkMessage ? <Text style={styles.successText}>{linkMessage}</Text> : null}
+
+          <TouchableOpacity
+            style={[styles.secondaryActionButton, (linkLoading || freeLinkLimitReached) && styles.secondaryActionButtonDisabled]}
+            onPress={() => void handleAddLink()}
+            disabled={linkLoading || freeLinkLimitReached}
+          >
+            <Text style={styles.secondaryActionButtonText}>
+              {linkLoading ? t.profile.saving : t.profile.addLink}
+            </Text>
+          </TouchableOpacity>
+
+          {currentPlan !== 'pro' ? (
+            <View style={styles.upgradeCard}>
+              <Text style={styles.upgradeTitle}>{t.profile.upgradeTitle}</Text>
+              <Text style={styles.upgradeDescription}>{t.profile.upgradeDescription}</Text>
+              <Text style={styles.upgradeMeta}>{t.profile.upgradeComingSoon}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+        {message ? <Text style={styles.successText}>{message}</Text> : null}
+
+        <TouchableOpacity style={styles.button} onPress={() => void handleSave()} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? t.profile.saving : t.profile.saveProfile}</Text>
         </TouchableOpacity>
 
-        {currentPlan !== 'pro' ? (
-          <View style={styles.upgradeCard}>
-            <Text style={styles.upgradeTitle}>{t.profile.upgradeTitle}</Text>
-            <Text style={styles.upgradeDescription}>{t.profile.upgradeDescription}</Text>
-            <Text style={styles.upgradeMeta}>{t.profile.upgradeComingSoon}</Text>
-          </View>
-        ) : null}
+        <Link href="/profile/preview" style={styles.link}>
+          <Text>{t.common.preview}</Text>
+        </Link>
+        <Link href="/settings" style={styles.link}>
+          <Text>{t.common.settings}</Text>
+        </Link>
       </View>
-
-      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-      {message ? <Text style={styles.successText}>{message}</Text> : null}
-
-      <TouchableOpacity style={styles.button} onPress={() => void handleSave()} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? t.profile.saving : t.profile.saveProfile}</Text>
-      </TouchableOpacity>
-
-      <Link href="/profile/preview" style={styles.link}>
-        <Text>{t.common.preview}</Text>
-      </Link>
-      <Link href="/settings" style={styles.link}>
-        <Text>{t.common.settings}</Text>
-      </Link>
     </ScrollView>
   );
 }
@@ -337,8 +339,15 @@ export default function EditProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#FAF7F1',
+  },
+  content: {
+    padding: 20,
+  },
+  formShell: {
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 28,

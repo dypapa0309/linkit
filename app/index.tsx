@@ -69,35 +69,37 @@ export default function Home() {
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t.home.sampleProfile}</Text>
-            <Text style={styles.sectionLead}>linkit-link.netlify.app/sangbin</Text>
-            <Text style={styles.sectionText}>{t.home.sampleProfileText}</Text>
-            <Link href="/public/sangbin" asChild>
-              <Pressable style={styles.inlineButton}>
-                <Text style={styles.inlineButtonText}>{t.home.openSample}</Text>
-              </Pressable>
-            </Link>
-          </View>
+          <View style={styles.minimalPanel}>
+            <View style={styles.sampleRow}>
+              <View style={styles.sampleCopy}>
+                <Text style={styles.sampleTitle}>{t.home.sampleProfile}</Text>
+                <Text style={styles.sampleUrl}>linkit-link.netlify.app/sangbin</Text>
+                <Text style={styles.sampleText}>{t.home.sampleProfileText}</Text>
+              </View>
+              <Link href="/public/sangbin" asChild>
+                <Pressable style={styles.inlineButton}>
+                  <Text style={styles.inlineButtonText}>{t.home.openSample}</Text>
+                </Pressable>
+              </Link>
+            </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t.home.madeForSharing}</Text>
-            <Text style={styles.sectionText}>{t.home.madeForSharingText}</Text>
-          </View>
+            <View style={styles.divider} />
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t.home.fastProfileSetup}</Text>
-            <Text style={styles.sectionText}>{t.home.fastProfileSetupText}</Text>
-          </View>
+            <View style={styles.summaryRow}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryTitle}>{t.home.madeForSharing}</Text>
+                <Text style={styles.summaryText}>{t.home.madeForSharingText}</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryTitle}>{t.home.webAppReady}</Text>
+                <Text style={styles.summaryText}>{t.home.webAppReadyText}</Text>
+              </View>
+            </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t.home.webAppReady}</Text>
-            <Text style={styles.sectionText}>{t.home.webAppReadyText}</Text>
-          </View>
-
-          <View style={styles.sectionAccent}>
-            <Text style={styles.sectionTitle}>{t.home.ownerNote}</Text>
-            <Text style={styles.sectionText}>{t.home.ownerNoteText}</Text>
+            <View style={styles.ownerNote}>
+              <Text style={styles.ownerNoteTitle}>{t.home.ownerNote}</Text>
+              <Text style={styles.ownerNoteText}>{t.home.ownerNoteText}</Text>
+            </View>
           </View>
 
           <View style={styles.footerLinks}>
@@ -158,44 +160,26 @@ const styles = StyleSheet.create({
   },
   page: {
     width: '100%',
-    maxWidth: 920,
+    maxWidth: 980,
     alignSelf: 'center',
   },
   hero: {
+    backgroundColor: '#FCF8F0',
+    borderRadius: 32,
+    paddingVertical: 64,
+    paddingHorizontal: 40,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E6DDCF',
+    alignItems: 'center',
+  },
+  minimalPanel: {
     backgroundColor: '#FFFDF8',
     borderRadius: 28,
-    padding: 40,
+    padding: 28,
     marginBottom: 18,
     borderWidth: 1,
     borderColor: '#E6DDCF',
-  },
-  section: {
-    backgroundColor: '#FFFDF8',
-    borderRadius: 28,
-    padding: 24,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#E6DDCF',
-  },
-  sectionAccent: {
-    backgroundColor: '#F2E3CF',
-    borderRadius: 28,
-    padding: 24,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: '#E2CEB4',
-  },
-  sectionTitle: {
-    color: '#1F1408',
-    fontSize: 24,
-    fontWeight: '800',
-    marginBottom: 10,
-  },
-  sectionLead: {
-    color: '#9B6B3E',
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 10,
   },
   eyebrow: {
     color: '#9B6B3E',
@@ -205,10 +189,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   title: {
-    fontSize: 42,
+    fontSize: 56,
     fontWeight: '800',
     marginTop: 12,
-    marginBottom: 16,
+    marginBottom: 18,
     color: '#1F1408',
   },
   loadingTitle: {
@@ -222,16 +206,18 @@ const styles = StyleSheet.create({
     color: '#1F1408',
   },
   subtitle: {
-    fontSize: 19,
+    fontSize: 18,
     lineHeight: 30,
     color: '#5B4B3A',
-    marginBottom: 24,
-    maxWidth: 720,
+    marginBottom: 28,
+    maxWidth: 700,
+    textAlign: 'center',
   },
   heroActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+    justifyContent: 'center',
   },
   primaryButton: {
     backgroundColor: '#1F1408',
@@ -259,22 +245,85 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  sectionText: {
-    color: '#5B4B3A',
-    lineHeight: 28,
-    fontSize: 16,
-  },
   inlineButton: {
-    alignSelf: 'flex-start',
-    marginTop: 18,
+    minHeight: 52,
     backgroundColor: '#1F1408',
     borderRadius: 14,
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inlineButtonText: {
     color: '#FFFFFF',
     fontWeight: '700',
+  },
+  sampleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 20,
+  },
+  sampleCopy: {
+    flex: 1,
+  },
+  sampleTitle: {
+    color: '#8B5A2B',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  sampleUrl: {
+    color: '#1F1408',
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  sampleText: {
+    color: '#5B4B3A',
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E8DDCF',
+    marginVertical: 24,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  summaryItem: {
+    flex: 1,
+  },
+  summaryTitle: {
+    color: '#1F1408',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  summaryText: {
+    color: '#5B4B3A',
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  ownerNote: {
+    marginTop: 24,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E8DDCF',
+  },
+  ownerNoteTitle: {
+    color: '#1F1408',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  ownerNoteText: {
+    color: '#5B4B3A',
+    lineHeight: 24,
+    fontSize: 15,
   },
   footerLinks: {
     flexDirection: 'row',
