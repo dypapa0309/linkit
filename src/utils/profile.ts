@@ -296,8 +296,9 @@ export async function uploadAvatar({ userId, uri, mimeType }: UploadAvatarInput)
 }
 
 export function subscribeToProfileRealtime(userId: string, onChange: () => void) {
+  const channelId = `profile-${userId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const channel = supabase
-    .channel(`profile-${userId}`)
+    .channel(channelId)
     .on(
       'postgres_changes',
       {

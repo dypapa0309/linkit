@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
@@ -118,8 +118,10 @@ export default function Register() {
           {googleLoading ? t.auth.googleLoading : t.auth.continueWithGoogle}
         </Text>
       </TouchableOpacity>
-      <Link href="/(auth)/login" style={styles.link}>
-        <Text>{t.auth.hasAccount}</Text>
+      <Link href="/(auth)/login" asChild>
+        <Pressable style={styles.linkButton}>
+          <Text style={styles.linkButtonText}>{t.auth.hasAccount}</Text>
+        </Pressable>
       </Link>
     </View>
   );
@@ -174,8 +176,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  link: {
+  linkButton: {
+    alignSelf: 'center',
+    minHeight: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  linkButtonText: {
     textAlign: 'center',
+    color: '#1F1408',
   },
   errorText: {
     color: '#C62828',

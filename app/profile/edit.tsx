@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { Link, Redirect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from '../../src/i18n';
@@ -445,11 +445,15 @@ export default function EditProfile() {
           <Text style={styles.buttonText}>{loading ? t.profile.saving : t.profile.saveProfile}</Text>
         </TouchableOpacity>
 
-        <Link href="/profile/preview" style={styles.link}>
-          <Text>{t.common.preview}</Text>
+        <Link href="/profile/preview" asChild>
+          <Pressable style={styles.linkButton}>
+            <Text style={styles.linkButtonText}>{t.common.preview}</Text>
+          </Pressable>
         </Link>
-        <Link href="/settings" style={styles.link}>
-          <Text>{t.common.settings}</Text>
+        <Link href="/settings" asChild>
+          <Pressable style={styles.linkButton}>
+            <Text style={styles.linkButtonText}>{t.common.settings}</Text>
+          </Pressable>
         </Link>
       </View>
     </ScrollView>
@@ -675,9 +679,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  link: {
-    textAlign: 'center',
+  linkButton: {
+    alignSelf: 'center',
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 16,
+  },
+  linkButtonText: {
+    textAlign: 'center',
+    color: '#1F1408',
+    fontWeight: '600',
   },
   errorText: {
     color: '#C62828',

@@ -103,14 +103,20 @@ export default function Home() {
           </View>
 
           <View style={styles.footerLinks}>
-            <Link href="/privacy" style={styles.footerLink}>
-              <Text>{t.home.privacy}</Text>
+            <Link href="/privacy" asChild>
+              <Pressable style={styles.footerLink}>
+                <Text style={styles.footerLinkText}>{t.home.privacy}</Text>
+              </Pressable>
             </Link>
-            <Link href="/terms" style={styles.footerLink}>
-              <Text>{t.home.terms}</Text>
+            <Link href="/terms" asChild>
+              <Pressable style={styles.footerLink}>
+                <Text style={styles.footerLinkText}>{t.home.terms}</Text>
+              </Pressable>
             </Link>
-            <Link href="/settings" style={styles.footerLink}>
-              <Text>{t.common.settings}</Text>
+            <Link href="/settings" asChild>
+              <Pressable style={styles.footerLink}>
+                <Text style={styles.footerLinkText}>{t.common.settings}</Text>
+              </Pressable>
             </Link>
           </View>
         </View>
@@ -335,6 +341,12 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     paddingVertical: 8,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerLinkText: {
+    color: '#5B4B3A',
   },
   appAuthContainer: {
     flex: 1,

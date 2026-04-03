@@ -82,8 +82,10 @@ export default function Preview() {
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.message}>{errorMessage || t.profile.saveFirst}</Text>
-        <Link href="/profile/edit" style={styles.link}>
-          <Text>{t.common.edit}</Text>
+        <Link href="/profile/edit" asChild>
+          <Pressable style={styles.linkButton}>
+            <Text style={styles.linkButtonText}>{t.common.edit}</Text>
+          </Pressable>
         </Link>
       </ScrollView>
     );
@@ -120,19 +122,15 @@ export default function Preview() {
   return (
     <ScrollView style={styles.container}>
       <ProfileHeader name={profile.name || profile.username} bio={profile.bio} avatarUrl={profile.avatar_url} />
-      
       {profile.cta_link ? (
         <CTAButton text={profile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
       ) : null}
-      
       <TrustBlock
         reviewCount={profile.trust_review_count}
         responseTime={profile.trust_response_time}
         reuseRate={profile.trust_reuse_rate}
       />
-      
       <ServiceCardList cards={profile.serviceCards} onCardPress={handleCardPress} />
-      
       <LinkItemList items={profile.linkItems} onItemPress={handleLinkPress} />
 
       <View style={styles.publicUrlRow}>
@@ -150,12 +148,16 @@ export default function Preview() {
         </Pressable>
       </View>
       {copyMessage ? <Text style={styles.copyMessage}>{copyMessage}</Text> : null}
-      
-      <Link href="/profile/edit" style={styles.link}>
-        <Text>{t.common.edit}</Text>
+
+      <Link href="/profile/edit" asChild>
+        <Pressable style={styles.linkButton}>
+          <Text style={styles.linkButtonText}>{t.common.edit}</Text>
+        </Pressable>
       </Link>
-      <Link href="/settings" style={styles.link}>
-        <Text>{t.common.settings}</Text>
+      <Link href="/settings" asChild>
+        <Pressable style={styles.linkButton}>
+          <Text style={styles.linkButtonText}>{t.common.settings}</Text>
+        </Pressable>
       </Link>
     </ScrollView>
   );
@@ -166,9 +168,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  link: {
+  linkButton: {
+    alignSelf: 'center',
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  linkButtonText: {
     textAlign: 'center',
-    marginBottom: 20,
+    color: '#1F1408',
+    fontWeight: '600',
   },
   message: {
     padding: 20,
