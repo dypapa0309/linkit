@@ -10,6 +10,12 @@ if (!fs.existsSync(distPath)) {
 const publicBaseUrl = (process.env.EXPO_PUBLIC_PUBLIC_BASE_URL || 'https://linkit-link.netlify.app').replace(/\/$/, '');
 const shareImageUrl = `${publicBaseUrl}/linkit-share.png`;
 const faviconUrl = `${publicBaseUrl}/favicon.png`;
+const fontStyleBlock = `
+    <style id="linkit-fonts">
+      html, body, #root, input, textarea, button {
+        font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Segoe UI", sans-serif;
+      }
+    </style>`;
 
 const metaBlock = `
     <meta name="description" content="내 소개와 링크를 한 장으로 공유하는 Linkit 프로필 페이지예요." />
@@ -27,10 +33,14 @@ const metaBlock = `
 
 const html = fs.readFileSync(distPath, 'utf8');
 
-if (html.includes('og:site_name')) {
-  process.exit(0);
+let nextHtml = html.replace('<html lang="en">', '<html lang="ko">');
+
+if (!nextHtml.includes('og:site_name')) {
+  nextHtml = nextHtml.replace('</head>', `${metaBlock}\n  </head>`);
 }
 
-const nextHtml = html.replace('</head>', `${metaBlock}\n  </head>`);
+if (!nextHtml.includes('linkit-fonts')) {
+  nextHtml = nextHtml.replace('</head>', `${fontStyleBlock}\n  </head>`);
+}
 
 fs.writeFileSync(distPath, nextHtml);
