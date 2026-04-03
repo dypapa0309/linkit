@@ -95,6 +95,28 @@ export async function upsertProfile({
   return data;
 }
 
+export function getProfileSaveErrorMessage(error: unknown) {
+  if (error instanceof PostgrestError) {
+    if (error.code === '23505') {
+      return '이미 사용 중인 공개 링크 주소예요. 다른 사용자 이름으로 바꿔주세요.';
+    }
+
+    if (error.code === '42501') {
+      return '로그인 상태가 확인되지 않아 저장하지 못했어요. 다시 로그인한 뒤 시도해주세요.';
+    }
+
+    if (error.message) {
+      return error.message;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return '저장 중 오류가 발생했어요.';
+}
+
 export async function ensureProfile({
   userId,
   email,

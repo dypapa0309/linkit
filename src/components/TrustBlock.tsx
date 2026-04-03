@@ -10,11 +10,30 @@ interface TrustBlockProps {
 
 export default function TrustBlock({ reviewCount, responseTime, reuseRate }: TrustBlockProps) {
   const { t } = useTranslation();
+
+  const hasTrustData = reviewCount > 0 || Boolean(responseTime.trim()) || Boolean(reuseRate.trim());
+
+  if (!hasTrustData) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.item}><Text style={styles.bold}>{reviewCount}</Text> {t.trust.reviews}</Text>
-      <Text style={styles.item}><Text style={styles.bold}>{responseTime}</Text> {t.trust.response}</Text>
-      <Text style={styles.item}><Text style={styles.bold}>{reuseRate}</Text> {t.trust.reuse}</Text>
+      {reviewCount > 0 ? (
+        <Text style={styles.item}>
+          <Text style={styles.bold}>{reviewCount}</Text> {t.trust.reviews}
+        </Text>
+      ) : null}
+      {responseTime.trim() ? (
+        <Text style={styles.item}>
+          <Text style={styles.bold}>{responseTime}</Text> {t.trust.response}
+        </Text>
+      ) : null}
+      {reuseRate.trim() ? (
+        <Text style={styles.item}>
+          <Text style={styles.bold}>{reuseRate}</Text> {t.trust.reuse}
+        </Text>
+      ) : null}
     </View>
   );
 }

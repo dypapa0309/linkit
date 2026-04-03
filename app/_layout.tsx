@@ -57,16 +57,16 @@ export default function RootLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: 'Home' }} />
-      <Stack.Screen name="(auth)/login" options={{ title: 'Login' }} />
-      <Stack.Screen name="(auth)/register" options={{ title: 'Register' }} />
-      <Stack.Screen name="auth/callback" options={{ title: 'Email Verification' }} />
-      <Stack.Screen name="privacy" options={{ title: 'Privacy Policy' }} />
-      <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-      <Stack.Screen name="terms" options={{ title: 'Terms of Service' }} />
-      <Stack.Screen name="profile/edit" options={{ title: 'Edit Profile' }} />
-      <Stack.Screen name="profile/preview" options={{ title: 'Preview' }} />
-      <Stack.Screen name="public/[username]" options={{ title: 'Public Page' }} />
+      <Stack.Screen name="index" options={{ title: '홈' }} />
+      <Stack.Screen name="(auth)/login" options={{ title: '로그인' }} />
+      <Stack.Screen name="(auth)/register" options={{ title: '회원가입' }} />
+      <Stack.Screen name="auth/callback" options={{ title: '이메일 인증' }} />
+      <Stack.Screen name="privacy" options={{ title: '개인정보처리방침' }} />
+      <Stack.Screen name="settings" options={{ title: '설정' }} />
+      <Stack.Screen name="terms" options={{ title: '이용약관' }} />
+      <Stack.Screen name="profile/edit" options={{ title: '프로필 수정' }} />
+      <Stack.Screen name="profile/preview" options={{ title: '미리보기' }} />
+      <Stack.Screen name="public/[username]" options={{ title: '공개 프로필' }} />
     </Stack>
   );
 }

@@ -97,7 +97,9 @@ export default function Preview() {
     <ScrollView style={styles.container}>
       <ProfileHeader name={publicProfile.name || publicProfile.username} bio={publicProfile.bio} />
       
-      <CTAButton text={publicProfile.cta_text || t.profile.contactMe} onPress={handleCTA} />
+      {publicProfile.cta_link ? (
+        <CTAButton text={publicProfile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
+      ) : null}
       
       <TrustBlock
         reviewCount={publicProfile.trust_review_count}
@@ -109,7 +111,7 @@ export default function Preview() {
       
       <LinkItemList items={publicProfile.linkItems} onItemPress={handleLinkPress} />
 
-      <Text style={styles.publicUrl}>{t.profile.publicUrl}: /public/{publicProfile.username}</Text>
+      <Text style={styles.publicUrl}>{t.profile.publicUrl}: /{publicProfile.username}</Text>
       
       <Link href="/profile/edit" style={styles.link}>
         <Text>{t.common.edit}</Text>

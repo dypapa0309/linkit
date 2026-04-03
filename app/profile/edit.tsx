@@ -4,7 +4,7 @@ import { Link, Redirect } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
 import { useProfileStore } from '../../src/stores/profileStore';
-import { fetchProfileByUserId, upsertProfile } from '../../src/utils/profile';
+import { fetchProfileByUserId, getProfileSaveErrorMessage, upsertProfile } from '../../src/utils/profile';
 
 export default function EditProfile() {
   const { t } = useTranslation();
@@ -17,9 +17,6 @@ export default function EditProfile() {
   const [bio, setBio] = useState('');
   const [ctaText, setCtaText] = useState('');
   const [ctaLink, setCtaLink] = useState('');
-  const [trustReviewCount, setTrustReviewCount] = useState('');
-  const [trustResponseTime, setTrustResponseTime] = useState('');
-  const [trustReuseRate, setTrustReuseRate] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -70,9 +67,6 @@ export default function EditProfile() {
     setBio(profile.bio);
     setCtaText(profile.cta_text);
     setCtaLink(profile.cta_link);
-    setTrustReviewCount(String(profile.trust_review_count));
-    setTrustResponseTime(profile.trust_response_time);
-    setTrustReuseRate(profile.trust_reuse_rate);
   }, [profile]);
 
   const handleSave = async () => {
@@ -80,8 +74,15 @@ export default function EditProfile() {
       return;
     }
 
-    if (!username.trim()) {
+    const trimmedUsername = username.trim().toLowerCase();
+
+    if (!trimmedUsername) {
       setErrorMessage(t.profile.publicUsernameRequired);
+      return;
+    }
+
+    if (/\s/.test(trimmedUsername)) {
+      setErrorMessage(t.profile.usernameRule);
       return;
     }
 
@@ -92,22 +93,19 @@ export default function EditProfile() {
     try {
       const nextProfile = await upsertProfile({
         userId: user.id,
-        username: username.trim().toLowerCase(),
+        username: trimmedUsername,
         updates: {
-          name: name.trim(),
+          name: name.trim() || trimmedUsername,
           bio: bio.trim(),
           cta_text: ctaText.trim(),
           cta_link: ctaLink.trim(),
-          trust_review_count: Number(trustReviewCount || 0),
-          trust_response_time: trustResponseTime.trim(),
-          trust_reuse_rate: trustReuseRate.trim(),
         },
       });
 
       setProfile(nextProfile);
       setMessage(t.profile.saved);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : t.profile.saveError);
+      setErrorMessage(getProfileSaveErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -120,27 +118,63 @@ export default function EditProfile() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>{t.profile.editProfile}</Text>
-      
-      <Text style={styles.sectionTitle}>{t.profile.profile}</Text>
-      <TextInput style={styles.input} placeholder={t.auth.username} value={username} onChangeText={setUsername} autoCapitalize="none" />
-      <TextInput style={styles.input} placeholder={t.profile.name} value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder={t.profile.bio} value={bio} onChangeText={setBio} multiline />
-      
-      <Text style={styles.sectionTitle}>{t.profile.cta}</Text>
-      <TextInput style={styles.input} placeholder={t.profile.ctaText} value={ctaText} onChangeText={setCtaText} />
-      <TextInput style={styles.input} placeholder={t.profile.ctaLink} value={ctaLink} onChangeText={setCtaLink} />
-      
-      <Text style={styles.sectionTitle}>{t.profile.trustData}</Text>
-      <TextInput style={styles.input} placeholder={t.profile.reviewCount} value={trustReviewCount} onChangeText={setTrustReviewCount} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder={t.profile.responseTime} value={trustResponseTime} onChangeText={setTrustResponseTime} />
-      <TextInput style={styles.input} placeholder={t.profile.reuseRate} value={trustReuseRate} onChangeText={setTrustReuseRate} />
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t.profile.publicLinkTitle}</Text>
+        <Text style={styles.helper}>{t.profile.publicLinkDescription}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={t.auth.username}
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t.profile.name}</Text>
+        <Text style={styles.helper}>{t.profile.displayNameDescription}</Text>
+        <TextInput style={styles.input} placeholder={t.profile.name} value={name} onChangeText={setName} />
+
+        <Text style={styles.sectionTitle}>{t.profile.bio}</Text>
+        <Text style={styles.helper}>{t.profile.bioDescription}</Text>
+        <TextInput
+          style={[styles.input, styles.multilineInput]}
+          placeholder={t.profile.bio}
+          value={bio}
+          onChangeText={setBio}
+          multiline
+          textAlignVertical="top"
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t.profile.cta}</Text>
+        <Text style={styles.helper}>{t.profile.primaryButtonDescription}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={t.profile.ctaText}
+          value={ctaText}
+          onChangeText={setCtaText}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder={t.profile.ctaLink}
+          value={ctaLink}
+          onChangeText={setCtaLink}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
       {message ? <Text style={styles.successText}>{message}</Text> : null}
-      
+
       <TouchableOpacity style={styles.button} onPress={() => void handleSave()} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? t.profile.saving : t.profile.saveProfile}</Text>
       </TouchableOpacity>
-      
+
       <Link href="/profile/preview" style={styles.link}>
         <Text>{t.common.preview}</Text>
       </Link>
@@ -155,26 +189,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F1',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     marginBottom: 20,
+    color: '#1F1408',
+  },
+  section: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E9E0D2',
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 20,
+    fontWeight: '700',
     marginBottom: 10,
+    color: '#1F1408',
+  },
+  helper: {
+    color: '#6C5B4B',
+    lineHeight: 22,
+    marginBottom: 12,
   },
   input: {
-    height: 52,
-    borderColor: '#EEEEEE',
+    minHeight: 52,
+    borderColor: '#E9E0D2',
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 16,
+    paddingVertical: 14,
     marginBottom: 12,
+    backgroundColor: '#FFFCF7',
+  },
+  multilineInput: {
+    minHeight: 110,
   },
   button: {
     backgroundColor: '#000000',
@@ -191,7 +244,7 @@ const styles = StyleSheet.create({
   },
   link: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 16,
   },
   errorText: {
     color: '#C62828',

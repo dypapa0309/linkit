@@ -84,7 +84,9 @@ export default function PublicProfileScreen({ username }: PublicProfileScreenPro
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.shell}>
         <ProfileHeader name={profile.name || profile.username} bio={profile.bio} />
-        <CTAButton text={profile.cta_text || t.profile.contactMe} onPress={handleCTA} />
+        {profile.cta_link ? (
+          <CTAButton text={profile.cta_text || t.profile.visitPrimaryLink} onPress={handleCTA} />
+        ) : null}
         <TrustBlock
           reviewCount={profile.trust_review_count}
           responseTime={profile.trust_response_time}

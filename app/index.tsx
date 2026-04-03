@@ -119,18 +119,26 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text style={styles.loggedInTitle}>{t.home.welcomeBack}</Text>
-      <Link href="/profile/edit" style={styles.button}>
-        <Text style={styles.buttonText}>{t.home.editProfile}</Text>
-      </Link>
-      <Link href="/profile/preview" style={styles.button}>
-        <Text style={styles.buttonText}>{t.common.preview}</Text>
-      </Link>
-      <Link href="/settings" style={styles.button}>
-        <Text style={styles.buttonText}>{t.common.settings}</Text>
-      </Link>
-      <TouchableOpacity style={styles.button} onPress={() => void logout()}>
-        <Text style={styles.buttonText}>{t.home.logout}</Text>
-      </TouchableOpacity>
+      <View style={styles.loggedInActions}>
+        <Link href="/profile/edit" asChild>
+          <Pressable style={styles.dashboardButton}>
+            <Text style={styles.dashboardButtonText}>{t.home.editProfile}</Text>
+          </Pressable>
+        </Link>
+        <Link href="/profile/preview" asChild>
+          <Pressable style={styles.dashboardButton}>
+            <Text style={styles.dashboardButtonText}>{t.common.preview}</Text>
+          </Pressable>
+        </Link>
+        <Link href="/settings" asChild>
+          <Pressable style={styles.dashboardButton}>
+            <Text style={styles.dashboardButtonText}>{t.common.settings}</Text>
+          </Pressable>
+        </Link>
+        <TouchableOpacity style={styles.dashboardButton} onPress={() => void logout()}>
+          <Text style={styles.dashboardButtonText}>{t.home.logout}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -208,9 +216,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   loggedInTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: '800',
+    marginBottom: 24,
+    color: '#1F1408',
   },
   subtitle: {
     fontSize: 19,
@@ -321,18 +330,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  button: {
-    backgroundColor: '#000000',
-    height: 52,
-    borderRadius: 12,
+  loggedInActions: {
+    width: '100%',
+    maxWidth: 260,
+    alignItems: 'center',
+  },
+  dashboardButton: {
+    width: '100%',
+    minHeight: 56,
+    backgroundColor: '#1F1408',
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
   },
-  buttonText: {
+  dashboardButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });
