@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import PublicProfileScreen from '../../src/screens/PublicProfileScreen';
+import PublicProfileScreen from '../src/screens/PublicProfileScreen';
 
-export default function PublicPage() {
+export default function UsernamePage() {
   const params = useLocalSearchParams();
   const username = String(params.username ?? 'anonymous');
 
