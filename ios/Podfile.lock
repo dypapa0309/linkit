@@ -8,9 +8,13 @@ PODS:
     - React-Core
   - Expo (51.0.39):
     - ExpoModulesCore
+  - ExpoAppleAuthentication (6.4.2):
+    - ExpoModulesCore
   - ExpoAsset (10.0.10):
     - ExpoModulesCore
   - ExpoClipboard (6.0.3):
+    - ExpoModulesCore
+  - ExpoCrypto (13.0.2):
     - ExpoModulesCore
   - ExpoFileSystem (17.0.1):
     - ExpoModulesCore
@@ -1269,8 +1273,10 @@ DEPENDENCIES:
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
   - Expo (from `../node_modules/expo`)
+  - ExpoAppleAuthentication (from `../node_modules/expo-apple-authentication/ios`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
+  - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoHead (from `../node_modules/expo-router/ios`)
@@ -1353,10 +1359,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-image-loader/ios"
   Expo:
     :path: "../node_modules/expo"
+  ExpoAppleAuthentication:
+    :path: "../node_modules/expo-apple-authentication/ios"
   ExpoAsset:
     :path: "../node_modules/expo-asset/ios"
   ExpoClipboard:
     :path: "../node_modules/expo-clipboard/ios"
+  ExpoCrypto:
+    :path: "../node_modules/expo-crypto/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
@@ -1493,8 +1503,10 @@ SPEC CHECKSUMS:
   EXConstants: 89d35611505a8ce02550e64e43cd05565da35f9a
   EXImageLoader: 1fe96c70cdc78bedc985ec4b1fab5dd8e67dc38b
   Expo: ed0a748eb6be0efd2c3df7f6de3f3158a14464c9
+  ExpoAppleAuthentication: 8a661b6f4936affafd830f983ac22463c936dad5
   ExpoAsset: 286fee7ba711ce66bf20b315e68106b13b8629fc
   ExpoClipboard: 243e22ff4161bbffcd3d2db469ae860ddc1156be
+  ExpoCrypto: c5c052d5f9f668c21975cb4caf072cec23c823fa
   ExpoFileSystem: 2988caaf68b7cb706e36d382829d99811d9d76a5
   ExpoFont: 38dddf823e32740c2a9f37c926a33aeca736b5c4
   ExpoHead: 1a1b30c6c1d125e9b8a199ca305c16a1dc041624

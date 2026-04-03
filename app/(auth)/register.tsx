@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useTranslation } from '../../src/i18n';
 import { useAuthStore } from '../../src/stores/authStore';
-import { getAuthRedirectUrl, signInWithGoogle } from '../../src/utils/auth';
+import {
+  getAuthRedirectUrl,
+  isAppleSignInSupported,
+  signInWithApple,
+  signInWithGoogle,
+} from '../../src/utils/auth';
 import { supabase } from '../../src/utils/supabase';
 
 export default function Register() {
@@ -15,9 +20,25 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
+  const [appleSupported, setAppleSupported] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    let mounted = true;
+
+    void isAppleSignInSupported().then((supported) => {
+      if (mounted) {
+        setAppleSupported(supported);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleRegister = async () => {
     if (!email.trim() || !password.trim() || !username.trim()) {
@@ -77,6 +98,24 @@ export default function Register() {
     }
   };
 
+  const handleAppleRegister = async () => {
+    setAppleLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const session = await signInWithApple();
+
+      if (session?.user) {
+        router.replace('/profile/edit');
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : t.auth.appleLoginError);
+    } finally {
+      setAppleLoading(false);
+    }
+  };
+
   if (initialized && user) {
     return <Redirect href="/profile/preview" />;
   }
@@ -118,6 +157,17 @@ export default function Register() {
           {googleLoading ? t.auth.googleLoading : t.auth.continueWithGoogle}
         </Text>
       </TouchableOpacity>
+      {appleSupported ? (
+        <TouchableOpacity
+          style={styles.appleButton}
+          onPress={() => void handleAppleRegister()}
+          disabled={appleLoading}
+        >
+          <Text style={styles.appleButtonText}>
+            {appleLoading ? t.auth.appleLoading : t.auth.continueWithApple}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
       <Link href="/(auth)/login" asChild>
         <Pressable style={styles.linkButton}>
           <Text style={styles.linkButtonText}>{t.auth.hasAccount}</Text>
@@ -166,6 +216,14 @@ const styles = StyleSheet.create({
     borderColor: '#DADADA',
     backgroundColor: '#FFFFFF',
   },
+  appleButton: {
+    height: 52,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: '#000000',
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
@@ -173,6 +231,11 @@ const styles = StyleSheet.create({
   },
   googleButtonText: {
     color: '#1F1408',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  appleButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

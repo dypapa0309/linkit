@@ -16,7 +16,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.linkit"
+      "bundleIdentifier": "com.anonymous.linkit",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +32,8 @@
     "scheme": "linkit",
     "plugins": [
       "expo-font",
-      "expo-localization"
+      "expo-localization",
+      "expo-apple-authentication"
     ]
   }
 }

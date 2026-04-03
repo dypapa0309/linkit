@@ -1,4 +1,6 @@
 import { Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { ensureProfile } from './profile';
@@ -112,4 +114,92 @@ export async function signInWithGoogle() {
   }
 
   return completeAuthFromUrl(result.url);
+}
+
+function createNonce(length = 32) {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = '';
+
+  for (let index = 0; index < length; index += 1) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    result += chars[randomIndex];
+  }
+
+  return result;
+}
+
+export async function isAppleSignInSupported() {
+  if (Platform.OS !== 'ios') {
+    return false;
+  }
+
+  return AppleAuthentication.isAvailableAsync();
+}
+
+export async function signInWithApple() {
+  if (Platform.OS !== 'ios') {
+    throw new Error('Apple 로그인은 iPhone에서 사용할 수 있어요.');
+  }
+
+  const rawNonce = createNonce();
+  const hashedNonce = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    rawNonce,
+  );
+
+  const credential = await AppleAuthentication.signInAsync({
+    requestedScopes: [
+      AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+      AppleAuthentication.AppleAuthenticationScope.EMAIL,
+    ],
+    nonce: hashedNonce,
+  });
+
+  if (!credential.identityToken) {
+    throw new Error('Apple 로그인 토큰을 받아오지 못했어요.');
+  }
+
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: credential.identityToken,
+    nonce: rawNonce,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.user) {
+    throw new Error('Apple 로그인 세션을 만들지 못했어요.');
+  }
+
+  const fullName = [credential.fullName?.givenName, credential.fullName?.familyName]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+
+  await ensureProfile({
+    userId: data.user.id,
+    email: data.user.email ?? null,
+    username: (data.user.user_metadata?.username as string | undefined) ?? null,
+    name:
+      fullName
+      || (data.user.user_metadata?.full_name as string | undefined)
+      || (data.user.user_metadata?.name as string | undefined)
+      || null,
+  });
+
+  return data.session;
+}
+
+export async function deleteMyAccount() {
+  const { error } = await supabase.functions.invoke('delete-account', {
+    method: 'POST',
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  await supabase.auth.signOut().catch(() => undefined);
 }

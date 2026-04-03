@@ -57,8 +57,11 @@ export const translations = {
       profileCreateError: '프로필 생성 중 오류가 발생했어요.',
       emailConfirmationSent: '회원가입이 완료됐어요. 메일 인증 링크를 누르면 앱으로 돌아와요.',
       continueWithGoogle: 'Google로 계속하기',
+      continueWithApple: 'Apple로 계속하기',
       googleLoading: 'Google 로그인 준비 중...',
+      appleLoading: 'Apple 로그인 준비 중...',
       googleLoginError: 'Google 로그인 중 오류가 발생했어요.',
+      appleLoginError: 'Apple 로그인 중 오류가 발생했어요.',
     },
     profile: {
       editProfile: '프로필 수정',
@@ -126,6 +129,14 @@ export const translations = {
       languageDescription: '기본 언어는 한국어예요. 필요하면 여기서 직접 바꿀 수 있어요.',
       currentLanguage: '현재 언어',
       deviceDefault: '기본값',
+      accountTitle: '계정 관리',
+      accountDescription: '앱에서 계정을 직접 삭제할 수 있어요. 삭제하면 프로필, 링크, 사진이 함께 사라져요.',
+      deleteAccount: '계정 삭제',
+      deletingAccount: '계정 삭제 중...',
+      deleteAccountConfirmTitle: '계정을 삭제할까요?',
+      deleteAccountConfirmMessage: '삭제 후에는 계정과 프로필, 링크, 사진을 복구할 수 없어요.',
+      deleteAccountSuccess: '계정이 삭제됐어요.',
+      deleteAccountError: '계정을 삭제하지 못했어요.',
     },
     authCallback: {
       title: '이메일 인증',
@@ -209,8 +220,11 @@ export const translations = {
       emailConfirmationSent:
         'Your account has been created. Tap the verification link in your email to return to the app.',
       continueWithGoogle: 'Continue with Google',
+      continueWithApple: 'Continue with Apple',
       googleLoading: 'Preparing Google sign-in...',
+      appleLoading: 'Preparing Apple sign-in...',
       googleLoginError: 'Something went wrong during Google sign-in.',
+      appleLoginError: 'Something went wrong during Apple sign-in.',
     },
     profile: {
       editProfile: 'Edit Profile',
@@ -285,6 +299,16 @@ export const translations = {
         'Korean is the default language. You can switch it here whenever you want.',
       currentLanguage: 'Current language',
       deviceDefault: 'Default',
+      accountTitle: 'Account',
+      accountDescription:
+        'You can delete your account directly in the app. Your profile, links, and uploaded photos will be removed together.',
+      deleteAccount: 'Delete account',
+      deletingAccount: 'Deleting account...',
+      deleteAccountConfirmTitle: 'Delete your account?',
+      deleteAccountConfirmMessage:
+        'This permanently removes your account, profile, links, and uploaded photos.',
+      deleteAccountSuccess: 'Your account has been deleted.',
+      deleteAccountError: 'Unable to delete your account.',
     },
     authCallback: {
       title: 'Email Verification',
