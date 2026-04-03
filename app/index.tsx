@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Platform,
+} from 'react-native';
 import { Link, Redirect } from 'expo-router';
 import { useTranslation } from '../src/i18n';
 import { useAuthStore } from '../src/stores/authStore';
@@ -19,9 +27,30 @@ export default function Home() {
   }
 
   if (!user) {
+    if (Platform.OS !== 'web') {
+      return (
+        <View style={styles.appAuthContainer}>
+          <Text style={styles.appTitle}>Linkit</Text>
+          <Text style={styles.appSubtitle}>
+            {t.home.subtitle}
+          </Text>
+          <Link href="/(auth)/register" asChild>
+            <Pressable style={styles.appPrimaryButton}>
+              <Text style={styles.appPrimaryButtonText}>{t.home.startFree}</Text>
+            </Pressable>
+          </Link>
+          <Link href="/(auth)/login" asChild>
+            <Pressable style={styles.appSecondaryButton}>
+              <Text style={styles.appSecondaryButtonText}>{t.home.login}</Text>
+            </Pressable>
+          </Link>
+        </View>
+      );
+    }
+
     return (
       <ScrollView contentContainerStyle={styles.marketingContainer}>
-        <View style={styles.heroShell}>
+        <View style={styles.page}>
           <View style={styles.hero}>
             <Text style={styles.eyebrow}>{t.home.eyebrow}</Text>
             <Text style={styles.title}>Linkit</Text>
@@ -40,38 +69,37 @@ export default function Home() {
             </View>
           </View>
 
-          <View style={styles.previewCard}>
-            <Text style={styles.previewLabel}>{t.home.sampleProfile}</Text>
-            <Text style={styles.previewUrl}>linkit-link.netlify.app/sangbin</Text>
-            <Text style={styles.previewText}>{t.home.sampleProfileText}</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.home.sampleProfile}</Text>
+            <Text style={styles.sectionLead}>linkit-link.netlify.app/sangbin</Text>
+            <Text style={styles.sectionText}>{t.home.sampleProfileText}</Text>
             <Link href="/public/sangbin" asChild>
-              <Pressable style={styles.previewButton}>
-                <Text style={styles.previewButtonText}>{t.home.openSample}</Text>
+              <Pressable style={styles.inlineButton}>
+                <Text style={styles.inlineButtonText}>{t.home.openSample}</Text>
               </Pressable>
             </Link>
           </View>
-        </View>
 
-        <View style={styles.featureGrid}>
-          <View style={styles.cardCompact}>
-            <Text style={styles.cardTitle}>{t.home.fastProfileSetup}</Text>
-            <Text style={styles.cardText}>{t.home.fastProfileSetupText}</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.home.madeForSharing}</Text>
+            <Text style={styles.sectionText}>{t.home.madeForSharingText}</Text>
           </View>
-          <View style={styles.cardCompact}>
-            <Text style={styles.cardTitle}>{t.home.madeForSharing}</Text>
-            <Text style={styles.cardText}>{t.home.madeForSharingText}</Text>
-          </View>
-          <View style={styles.cardWide}>
-            <Text style={styles.cardTitle}>{t.home.webAppReady}</Text>
-            <Text style={styles.cardText}>{t.home.webAppReadyText}</Text>
-          </View>
-          <View style={styles.cardWideAccent}>
-            <Text style={styles.cardTitle}>{t.home.ownerNote}</Text>
-            <Text style={styles.cardText}>{t.home.ownerNoteText}</Text>
-          </View>
-        </View>
 
-        <View style={styles.featureGrid}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.home.fastProfileSetup}</Text>
+            <Text style={styles.sectionText}>{t.home.fastProfileSetupText}</Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.home.webAppReady}</Text>
+            <Text style={styles.sectionText}>{t.home.webAppReadyText}</Text>
+          </View>
+
+          <View style={styles.sectionAccent}>
+            <Text style={styles.sectionTitle}>{t.home.ownerNote}</Text>
+            <Text style={styles.sectionText}>{t.home.ownerNoteText}</Text>
+          </View>
+
           <View style={styles.footerLinks}>
             <Link href="/privacy" style={styles.footerLink}>
               <Text>{t.home.privacy}</Text>
@@ -118,60 +146,48 @@ const styles = StyleSheet.create({
   marketingContainer: {
     padding: 24,
     backgroundColor: '#F7F2EA',
+    justifyContent: 'center',
   },
-  heroShell: {
-    flexDirection: 'row',
-    gap: 16,
-    alignItems: 'stretch',
-    marginBottom: 18,
-    flexWrap: 'wrap',
+  page: {
+    width: '100%',
+    maxWidth: 920,
+    alignSelf: 'center',
   },
   hero: {
-    flex: 2,
-    minWidth: 320,
     backgroundColor: '#FFFDF8',
     borderRadius: 28,
-    padding: 28,
+    padding: 40,
+    marginBottom: 18,
     borderWidth: 1,
     borderColor: '#E6DDCF',
   },
-  previewCard: {
-    flex: 1,
-    minWidth: 260,
-    backgroundColor: '#1F1408',
+  section: {
+    backgroundColor: '#FFFDF8',
     borderRadius: 28,
     padding: 24,
-  },
-  previewLabel: {
-    color: '#E7C89E',
-    fontSize: 12,
-    fontWeight: '700',
     marginBottom: 14,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    borderWidth: 1,
+    borderColor: '#E6DDCF',
   },
-  previewUrl: {
-    color: '#FFFFFF',
+  sectionAccent: {
+    backgroundColor: '#F2E3CF',
+    borderRadius: 28,
+    padding: 24,
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: '#E2CEB4',
+  },
+  sectionTitle: {
+    color: '#1F1408',
     fontSize: 24,
     fontWeight: '800',
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  previewText: {
-    color: '#E4D7C7',
-    lineHeight: 22,
-    marginBottom: 20,
-  },
-  previewButton: {
-    backgroundColor: '#F0E1CE',
-    minHeight: 48,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  previewButtonText: {
-    color: '#1F1408',
-    fontWeight: '700',
+  sectionLead: {
+    color: '#9B6B3E',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 10,
   },
   eyebrow: {
     color: '#9B6B3E',
@@ -197,15 +213,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   subtitle: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 19,
+    lineHeight: 30,
     color: '#5B4B3A',
     marginBottom: 24,
+    maxWidth: 720,
   },
   heroActions: {
-    gap: 12,
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 12,
   },
   primaryButton: {
     backgroundColor: '#1F1408',
@@ -233,67 +250,76 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  featureGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    marginBottom: 20,
-  },
-  cardCompact: {
-    flexBasis: 280,
-    flexGrow: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E9E0D2',
-  },
-  cardWide: {
-    flexBasis: 420,
-    flexGrow: 2,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E9E0D2',
-  },
-  cardWideAccent: {
-    flexBasis: 420,
-    flexGrow: 2,
-    backgroundColor: '#F4E6D3',
-    borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E2CEB4',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E9E0D2',
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F1408',
-    marginBottom: 8,
-  },
-  cardText: {
+  sectionText: {
     color: '#5B4B3A',
-    lineHeight: 22,
+    lineHeight: 28,
+    fontSize: 16,
+  },
+  inlineButton: {
+    alignSelf: 'flex-start',
+    marginTop: 18,
+    backgroundColor: '#1F1408',
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  inlineButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   footerLinks: {
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '100%',
     flexWrap: 'wrap',
     gap: 16,
-    paddingBottom: 24,
-    marginTop: 4,
+    paddingBottom: 32,
+    paddingTop: 4,
   },
   footerLink: {
     paddingVertical: 8,
+  },
+  appAuthContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    backgroundColor: '#FFFDF8',
+  },
+  appTitle: {
+    fontSize: 42,
+    fontWeight: '800',
+    color: '#1F1408',
+    marginBottom: 14,
+  },
+  appSubtitle: {
+    color: '#5B4B3A',
+    lineHeight: 24,
+    fontSize: 16,
+    marginBottom: 24,
+  },
+  appPrimaryButton: {
+    minHeight: 54,
+    borderRadius: 16,
+    backgroundColor: '#1F1408',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  appPrimaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  appSecondaryButton: {
+    minHeight: 54,
+    borderRadius: 16,
+    backgroundColor: '#EEE4D6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  appSecondaryButtonText: {
+    color: '#1F1408',
+    fontSize: 16,
+    fontWeight: '700',
   },
   button: {
     backgroundColor: '#000000',
